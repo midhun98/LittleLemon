@@ -38,6 +38,9 @@ class MenuItemSerializer(serializers.ModelSerializer):
         ),
     ]
 
+    This will make sure that title remains unique while creating the menuitem
+    title = serializers.CharField(max_length=255,
+            validators=[UniqueValidator(queryset=MenuItem.objects.all())])
 
     """
     stock = serializers.IntegerField(source='inventory')
