@@ -10,6 +10,8 @@ urlpatterns = [
     path('api/menu-items/', views.menu_items, name='menu_items'),
     path('api/secret/', views.secret, name='secret'),
     path('api/manager-view/', views.manager_view),
+    path('api/throttle-check/', views.throttle_check),
+    path('api/throttle-check-auth/', views.throttle_check_auth),
     path('api/api-token-auth/', obtain_auth_token),
     path('api/single-items/<int:id>/', views.single_item, name='single_item'),
     path('category/<int:pk>',views.category_detail, name='category-detail'),
