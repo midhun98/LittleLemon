@@ -4,11 +4,11 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 from .models import MenuItem, Category
 from .serializers import MenuItemSerializer, CategorySerializer, MenuItemSerializer2
-
+from .throttles import TenCallsPerMinuteThrottle
 
 # Create your views here.
 
@@ -81,11 +81,23 @@ def category_detail(request, pk):
 
 
 class MenuItemsViewSet(viewsets.ModelViewSet):
+    """
+    throttle_classes should be commented if we are using def get_throttles
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
+    """
+    # throttle_classes = [AnonRateThrottle, UserRateThrottle]
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
     ordering_fields = ['price', 'inventory']
     search_fields = ['title', 'category__title']
 
+
+    def get_throttles(self):
+        if self.action == 'create':
+            throttle_classes = [UserRateThrottle]
+        else:
+            throttle_classes = []
+        return [throttle() for throttle in throttle_classes]
 
 @api_view()
 @permission_classes([IsAuthenticated])
@@ -108,6 +120,6 @@ def throttle_check(request):
 
 @api_view()
 @permission_classes([IsAuthenticated])
-@throttle_classes([AnonRateThrottle])
+@throttle_classes([TenCallsPerMinuteThrottle])
 def throttle_check_auth(request):
     return Response({"message": "message for logged in users only"})
