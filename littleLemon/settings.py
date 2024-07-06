@@ -138,9 +138,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
+    # set DEFAULT_THROTTLE_CLASSES as empty, So it won't apply throttling to all endpoints
     'DEFAULT_THROTTLE_CLASSES': [
-     'rest_framework.throttling.AnonRateThrottle',
-     'rest_framework.throttling.UserRateThrottle'
+     # 'rest_framework.throttling.AnonRateThrottle',
+     # 'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
         'anon': '2/minute',
