@@ -1,12 +1,14 @@
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import MenuItem, Category
 from .serializers import MenuItemSerializer, CategorySerializer, MenuItemSerializer2
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator, EmptyPage
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes
 # Create your views here.
+
 
 @api_view(['GET', 'POST'])
 def menu_items(request):
@@ -73,3 +75,23 @@ def category_detail(request, pk):
     category = get_object_or_404(Category, pk=pk)
     serialized_category = CategorySerializer(category)
     return Response(serialized_category.data)
+
+
+class MenuItemsViewSet(viewsets.ModelViewSet):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+    ordering_fields=['price','inventory']
+    search_fields = ['title', 'category__title']
+
+
+@api_view()
+@permission_classes([IsAuthenticated])
+def secret(request):
+    return Response({"message" : "Some secret message"})
+
+@api_view()
+@permission_classes([IsAuthenticated])
+def manager_view(request):
+    if request.user.groups.filter(name='Manager').exists():
+        return Response({"message" : "Only manager should see this"})
+    return Response({"message" : "Unauthorized"}, 403)
