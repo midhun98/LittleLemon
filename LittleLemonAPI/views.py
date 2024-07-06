@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -6,12 +5,40 @@ from .models import MenuItem, Category
 from .serializers import MenuItemSerializer, CategorySerializer, MenuItemSerializer2
 from django.shortcuts import get_object_or_404
 
+
 # Create your views here.
 
 @api_view(['GET', 'POST'])
 def menu_items(request):
+    """
+    if we want to filter by multiple items
+    eg: api/menu-items/?ordering=price,inventory
+
+    the ordering will be first done with price followed by inventory
+
+        ordering_fields = ordering.split(',')
+        items = items.order_by(*ordering_fields)
+
+    eg: api/menu-items/?ordering=price
+        items = items.order_by(ordering)
+        This will order with price
+    """
     if request.method == 'GET':
         items = MenuItem.objects.select_related('category').all()
+        category_name = request.GET.get('category')
+        to_price = request.GET.get('price')
+        search = request.GET.get('search')
+        ordering = request.GET.get('ordering')
+        if category_name:
+            items = items.filter(category__name=category_name)
+        if to_price:
+            items = items.filter(price__lte=to_price)
+        if search:
+            items = items.filter(title__icontains=search)
+        if ordering:
+            # items = items.order_by(ordering)
+            ordering_fields = ordering.split(',')
+            items = items.order_by(*ordering_fields)
         serialized_items = MenuItemSerializer2(items, many=True, context={'request': request})
         return Response(serialized_items.data)
 
@@ -23,6 +50,7 @@ def menu_items(request):
         serialized_item.save()
         return Response(serialized_item.data, status.HTTP_201_CREATED)
 
+
 @api_view()
 def single_item(request, id):
     item = get_object_or_404(MenuItem, pk=id)
@@ -32,6 +60,6 @@ def single_item(request, id):
 
 @api_view()
 def category_detail(request, pk):
-    category = get_object_or_404(Category,pk=pk)
+    category = get_object_or_404(Category, pk=pk)
     serialized_category = CategorySerializer(category)
     return Response(serialized_category.data)
