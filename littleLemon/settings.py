@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'LittleLemonAPI',
     'django_filters',
-    'djoser'
+    'djoser',
+    'rest_framework_simplejwt'
 ]
 
 MIDDLEWARE = [
@@ -133,6 +134,7 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
@@ -154,4 +156,8 @@ REST_FRAMEWORK = {
 DJOSER = {
     "USER_ID_FIELD": "username",
     "LOGIN_FIELD": "email",
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
 }
