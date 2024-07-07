@@ -10,6 +10,7 @@ from .models import MenuItem, Category
 from .serializers import MenuItemSerializer, CategorySerializer, MenuItemSerializer2
 from .throttles import TenCallsPerMinuteThrottle
 
+
 # Create your views here.
 
 
@@ -91,13 +92,13 @@ class MenuItemsViewSet(viewsets.ModelViewSet):
     ordering_fields = ['price', 'inventory']
     search_fields = ['title', 'category__title']
 
-
     def get_throttles(self):
         if self.action == 'create':
             throttle_classes = [UserRateThrottle]
         else:
             throttle_classes = []
         return [throttle() for throttle in throttle_classes]
+
 
 @api_view()
 @permission_classes([IsAuthenticated])
@@ -117,6 +118,7 @@ def manager_view(request):
 @throttle_classes([AnonRateThrottle])
 def throttle_check(request):
     return Response({"message": "successful"})
+
 
 @api_view()
 @permission_classes([IsAuthenticated])
