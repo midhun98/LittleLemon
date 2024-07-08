@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/throttle-check/', views.throttle_check),
     path('api/throttle-check-auth/', views.throttle_check_auth),
     path('api/api-token-auth/', obtain_auth_token),
+    path('api/groups/manager/users/', views.managers),
     path('api/single-items/<int:id>/', views.single_item, name='single_item'),
     path('category/<int:pk>', views.category_detail, name='category-detail'),
     path('api/', include(router.urls)),
